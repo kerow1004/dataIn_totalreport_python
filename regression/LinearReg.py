@@ -18,8 +18,6 @@ def query_data(report_idx, analysis_idx, model_list, values_round):
         df_pivot = dataframe_pivot(db_query(query, 's'), model_type, report_idx, analysis_idx, values_round)
         df_merge[df_pivot.columns[-1:]] = df_pivot
 
-    # print(df_merge.head())
-
     regression_process(df_merge, report_idx, analysis_idx, model_type[0], values_round)
 
 def insert_query(report_idx, analysis_idx, model_type, quiz_no, satisfaction_val, IPA_coef, values_round):
@@ -73,9 +71,12 @@ def regression_process(data_reg, report_idx, analysis_idx, model_type, values_ro
     x = data_reg.iloc[:, :-1]
     y = data_reg.iloc[:, -1:]
     reg = sm.OLS(zscore(y), zscore(x)).fit()
-    reg_sum = reg.params.sum()
+    # 회기계수 합
+    reg_sum = reg.params.abs().sum()
+    # 회기계수 절대값으로 비율
     result = reg.params.abs() / reg_sum
     data_avg = data_reg.iloc[:, :-1].mean()
+
 
     [insert_query(report_idx, analysis_idx, model_type, result.index[(x)], result.values[x], data_avg.values[x], values_round) for x in range(len(result))]
 
