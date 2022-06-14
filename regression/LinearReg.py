@@ -71,12 +71,13 @@ def regression_process(data_reg, report_idx, analysis_idx, model_type, values_ro
     x = data_reg.iloc[:, :-1]
     y = data_reg.iloc[:, -1:]
     reg = sm.OLS(zscore(y), zscore(x)).fit()
-    # 회기계수 합
+    # 회기계수 절대값의 합
     reg_sum = reg.params.abs().sum()
     # 회기계수 절대값으로 비율
     result = reg.params.abs() / reg_sum
     data_avg = data_reg.iloc[:, :-1].mean()
-
+    # print(result)
+    # print(reg.tvalues)
 
     [insert_query(report_idx, analysis_idx, model_type, result.index[(x)], result.values[x], data_avg.values[x], values_round) for x in range(len(result))]
 
